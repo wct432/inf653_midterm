@@ -11,7 +11,7 @@ include_once '../objects/quotes.php';
 $database = new Database();
 $db = $database->getConnection();
 $quotes = new Quotes($db);
-
+echo("!!!!!!!!!!!!!!!!!!!!");
 // query quotes
 $stmt = $quotes->read();
 $num = $stmt->rowCount();

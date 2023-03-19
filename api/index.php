@@ -2,6 +2,9 @@
 
 require_once("../objects/quotes.php");
 require_once("../config/database.php");
+require_once("../routing/quotes.php");
+require_once("../routing/authors.php");
+require_once("../routing/categories.php");
 
 // Define the base path for the API
 define('BASE_PATH', '/api/');
@@ -29,69 +32,23 @@ $method = $_SERVER['REQUEST_METHOD'];
 $database = new Database();
 $db = $database->getConnection();
 
-var_dump($db);
+function isJson($string) {
+  json_decode($string);
+  return json_last_error() === JSON_ERROR_NONE;
+}
 
 // Switch on the path and HTTP method to determine the appropriate action
 switch ($path_segments[0]) {
   case 'quotes':
-    // include_once('objects/quotes.php');
-    $quotes = new Quotes($db);
-    switch ($method) {
-      case 'GET':
-        if (isset($_GET['id'])) {
-          $result = $quotes->read_single($_GET['id']);
-        } else if ((isset($_GET['author_id'])) & isset($_GET['category_id'])){
-          $author_id = $_GET['author_id'];
-          $category_id = $_GET['category_id'];
-          $result = $quotes->get_by_auth_and_cat($author_id, $category_id);
-        } else if (isset($_GET['author_id'])) {
-          // Get author_id value from query string
-          $author_id = $_GET['author_id'];
-          // Call function to retrieve all quotes from author_id
-          $result = $quotes->get_quotes_by_author($author_id);
-        } else if (isset($_GET['category_id'])){
-          $category_id = $_GET['category_id'];
-          $result = $quotes->get_quotes_by_category($category_id);
-        }else {
-          $result = $quotes->read();
-        }
-        break;
-      case 'POST':
-        $data = json_decode(file_get_contents('php://input'));
-        $result = $quotes->create($data->quote, $data->author_id, $data->category_id);
-        break;
-      case 'PUT':
-        if (isset($path_segments[1])) {
-          $data = json_decode(file_get_contents('php://input'));
-          $result = $quotes->update($path_segments[1], $data->quote, $data->author_id, $data->category_id);
-        } else {
-          http_response_code(400);
-          $result = array('error' => 'Missing quote ID');
-        }
-        break;
-      case 'DELETE':
-        if (isset($path_segments[1])) {
-          $result = $quotes->delete($path_segments[1]);
-        } else {
-          http_response_code(400);
-          $result = array('error' => 'Missing quote ID');
-        }
-        break;
-      default:
-        http_response_code(405);
-        $result = array('error' => 'Invalid method');
-    }
-    echo json_encode($result);
+   get_quote_result($path_segments, $method, $db);
     break;
 
   case 'authors':
-    // Handle requests for the authors endpoint
-    // ...
+    get_author_result($path_segments, $method, $db);
     break;
 
   case 'categories':
-    // Handle requests for the categories endpoint
-    // ...
+    get_category_result($path_segments, $method, $db);
     break;
 
   default:

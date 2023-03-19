@@ -20,33 +20,165 @@ class Quotes {
         $this->conn = $db;
     }
 
-    // create quote
-    function create(){
-        // insert query
-        $query = "INSERT INTO " . $this->table_name . "
-                SET
-                    quote=:quote, author_id=:author_id, category_id=:category_id";
 
+    function create($id, $quote, $author_id, $category_id){
+        // check if all parameters are present
+        if(empty($id) || empty($quote) || empty($author_id) || empty($category_id)){
+            return array('message' => 'Missing Required Parameters');
+        }
+        // insert query
+        $query = "INSERT INTO " . $this->table_name . " (id, quote, author_id, category_id) 
+                  VALUES (:id, :quote, :author_id, :category_id)";
+    
         // prepare query
         $stmt = $this->conn->prepare($query);
-
+    
         // sanitize
-        $this->quote=htmlspecialchars(strip_tags($this->quote));
-        $this->author_id=htmlspecialchars(strip_tags($this->author_id));
-        $this->category_id=htmlspecialchars(strip_tags($this->category_id));
-
+        $quote=htmlspecialchars(strip_tags($quote));
+        $author_id=htmlspecialchars(strip_tags($author_id));
+        $category_id=htmlspecialchars(strip_tags($category_id));
+    
         // bind values
-        $stmt->bindParam(":quote", $this->quote);
-        $stmt->bindParam(":author_id", $this->author_id);
-        $stmt->bindParam(":category_id", $this->category_id);
+        $stmt->bindParam(":id", $id);
+        $stmt->bindParam(":quote", $quote);
+        $stmt->bindParam(":author_id", $author_id);
+        $stmt->bindParam(":category_id", $category_id);
+    
 
-        // execute query
-        if($stmt->execute()){
-            return true;
-        }
-
+        try {
+            // execute query
+            if($stmt->execute()){
+                // construct array of inserted data
+                $data = array(
+                    "id" => $id,
+                    "quote" => $quote,
+                    "author_id" => $author_id,
+                    "category_id" => $category_id
+                );
+    
+                // return JSON of inserted data
+                return json_encode($data);
+            }
+        } catch (PDOException $e) {
+            if ($e->getCode() == '23503') {
+                // Check if the error code is 23503, which is the error code for foreign key violation
+                $errorInfo = $e->errorInfo;
+                if (strpos($errorInfo[2], 'fk_author_id') !== false) {
+                    return array('message' => 'author_id Not Found');
+                } elseif (strpos($errorInfo[2], 'fk_category_id') !== false) {
+                    return array('message' => 'category_id Not Found');
+                } else {
+                    echo "Foreign key violation error: " . $e->getMessage();
+                }
+            } else {
+                // Handle other types of PDOExceptions here
+                echo "Error: " . $e->getMessage();
+            }
+    
+        echo("FAILURE");
         return false;
     }
+
+}
+    
+
+
+
+    function update($id, $quote, $author_id, $category_id){
+        // check if all parameters are present
+        if(empty($id) || empty($quote) || empty($author_id) || empty($category_id)){
+            return array('message' => 'Missing Required Parameters');
+        }
+    
+        // update query
+        $query = "UPDATE " . $this->table_name . "
+                SET
+                    quote=:quote, author_id=:author_id, category_id=:category_id
+                WHERE
+                    id = :id";
+    
+        // prepare query statement
+        $stmt = $this->conn->prepare($query);
+    
+        // sanitize
+        $id=htmlspecialchars(strip_tags($id));
+        $quote=htmlspecialchars(strip_tags($quote));
+        $author_id=htmlspecialchars(strip_tags($author_id));
+        $category_id=htmlspecialchars(strip_tags($category_id));
+    
+        // bind values
+        $stmt->bindParam(":id", $id);
+        $stmt->bindParam(":quote", $quote);
+        $stmt->bindParam(":author_id", $author_id);
+        $stmt->bindParam(":category_id", $category_id);
+    
+        try {
+            $stmt->execute();
+            if($stmt->rowCount() == 0){
+                return array('message' => 'No Quotes Found');
+            } else {
+                $data = array(
+                    "id" => $id,
+                    "quote" => $quote,
+                    "author_id" => $author_id,
+                    "category_id" => $category_id
+                );
+                // return JSON of inserted data
+                return json_encode($data);
+            }
+        } catch (PDOException $e) {
+            if ($e->getCode() == '23503') {
+                // Check if the error code is 23503, which is the error code for foreign key violation
+                $errorInfo = $e->errorInfo;
+                if (strpos($errorInfo[2], 'fk_author_id') !== false) {
+                    return array('message' => 'author_id Not Found');
+                } elseif (strpos($errorInfo[2], 'fk_category_id') !== false) {
+                    return array('message' => 'category_id Not Found');
+                } else {
+                    echo "Foreign key violation error: " . $e->getMessage();
+                }
+            } else {
+                // Handle other types of PDOExceptions here
+                echo "Error: " . $e->getMessage();
+            }
+        return false;
+        }
+    
+    }
+
+
+
+
+function delete($id) {
+    // check if all parameters are present
+    if(empty($id)){
+        return array('message' => 'Missing Required Parameters');
+        }
+    // delete query
+    $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
+
+    // prepare query
+    $stmt = $this->conn->prepare($query);
+
+    // bind parameter
+    $stmt->bindParam(":id", $id);
+
+    try {
+        // execute query
+        $stmt->execute();
+        // echo($stmt->rowCount());
+        if($stmt->rowCount() > 0) {
+            return array('id' => $id);
+        } else {
+            return array('message' => 'No Quotes Found');
+        }
+    } catch(PDOException $exception) {
+        echo "Error: " . $exception->getMessage();
+        return false;
+    }
+}
+
+
 
     // read quotes
     function read(){
@@ -126,7 +258,7 @@ class Quotes {
                 // Return JSON object with message "No quotes found"
                 return array('message' => 'No Quotes Found');
             }
-        
+            
             // return fetched row data
             return $rows;
         }
@@ -157,7 +289,6 @@ class Quotes {
                 return array('message' => 'No Quotes Found');
             }
         
-            // return fetched row data
             return $rows;
         }
 
@@ -195,59 +326,9 @@ class Quotes {
             return $rows;
         }
 
-    // update the quote
-    function update(){
-        // update query
-        $query = "UPDATE " . $this->table_name . "
-                SET
-                    quote=:quote, author_id=:author_id, category_id=:category_id
-                WHERE
-                    id = :id";
-
-        // prepare query statement
-        $stmt = $this->conn->prepare($query);
-
-        // sanitize
-        $this->id=htmlspecialchars(strip_tags($this->id));
-        $this->quote=htmlspecialchars(strip_tags($this->quote));
-        $this->author_id=htmlspecialchars(strip_tags($this->author_id));
-        $this->category_id=htmlspecialchars(strip_tags($this->category_id));
-
-        // bind values
-        $stmt->bindParam(":id", $this->id);
-        $stmt->bindParam(":quote", $this->quote);
-        $stmt->bindParam(":author_id", $this->author_id);
-        $stmt->bindParam(":category_id", $this->category_id);
-
-        // execute the query
-        if($stmt->execute()){
-            return true;
-        }
-
-        return false;
-    }
+    
 
 
-    // delete the quote
-    function delete(){
-        // delete query
-        $query = "DELETE FROM " . $this->table_name . " WHERE id = ?";
-
-        // prepare query
-        $stmt = $this->conn->prepare($query);
-
-        // sanitize
-        $this->id=htmlspecialchars(strip_tags($this->id));
-
-        // bind id of record to delete
-        $stmt->bindParam(1, $this->id);
-
-        // execute query
-        if($stmt->execute()){
-            return true;
-        }
-
-        return false;
-    }
+    
 
 }
