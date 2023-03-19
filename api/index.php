@@ -38,6 +38,10 @@ switch ($path_segments[0]) {
       case 'GET':
         if (isset($_GET['id'])) {
           $result = $quotes->read_single($_GET['id']);
+        } else if ((isset($_GET['author_id'])) & isset($_GET['category_id'])){
+          $author_id = $_GET['author_id'];
+          $category_id = $_GET['category_id'];
+          $result = $quotes->get_by_auth_and_cat($author_id, $category_id);
         } else if (isset($_GET['author_id'])) {
           // Get author_id value from query string
           $author_id = $_GET['author_id'];

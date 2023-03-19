@@ -50,21 +50,28 @@ class Quotes {
 
     // read quotes
     function read(){
-        // select all query
-        // $query = "SELECT q.id, q.quote, a.author, c.category
-        //         FROM " . $this->table_name . " q
-        //             LEFT JOIN authors a ON q.author_id = a.id
-        //             LEFT JOIN categories c ON q.category_id = c.id
-        //         ORDER BY q.id DESC";
         $query = "SELECT * from quotes;";
 
         // prepare query statement
         $stmt = $this->conn->prepare($query);
-
+    
         // execute query
         $stmt->execute();
+    
+            // fetch all rows returned by the query
+        $rows = array();
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $rows[] = $row;
+        }
 
-        return $stmt;
+        // Check if row is empty
+        if(empty($rows)) {
+            // Return JSON object with message "No quotes found"
+            return array('message' => 'No Quotes Found');
+        }
+        
+        // return fetched row data
+        return $rows;
     }
 
     // read single quote by ID
@@ -135,6 +142,40 @@ class Quotes {
             // bind id of quote to be read
             $stmt->bindParam(1, $category_id);
         
+            // execute query
+            $stmt->execute();
+        
+             // fetch all rows returned by the query
+            $rows = array();
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $rows[] = $row;
+            }
+    
+            // Check if row is empty
+            if(empty($rows)) {
+                // Return JSON object with message "No quotes found"
+                return array('message' => 'No Quotes Found');
+            }
+        
+            // return fetched row data
+            return $rows;
+        }
+
+    function get_by_auth_and_cat($author_id, $category_id){
+    
+            $query = "SELECT * FROM quotes 
+                    WHERE author_id = ? 
+                    AND category_id = ?";
+        
+            // prepare query statement
+            $stmt = $this->conn->prepare($query);
+        
+            // bind id of author
+            $stmt->bindParam(1, $author_id);
+        
+            // bind id of category
+            $stmt->bindParam(2, $category_id);
+            
             // execute query
             $stmt->execute();
         
