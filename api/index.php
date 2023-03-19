@@ -29,6 +29,8 @@ $method = $_SERVER['REQUEST_METHOD'];
 $database = new Database();
 $db = $database->getConnection();
 
+var_dump($db);
+
 // Switch on the path and HTTP method to determine the appropriate action
 switch ($path_segments[0]) {
   case 'quotes':

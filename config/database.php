@@ -1,12 +1,21 @@
 <?php
-
+require_once("set_vars.php");
+set_vars();
 class Database {
-    private $host = "dpg-cgb2ts1mbg55nqkr88tg-a.oregon-postgres.render.com"; // for example: postgresql.example.com
-    private $port = "5432"; // for example: 5432
-    private $db_name = "quotesdb_o5h8";
-    private $username = "quotesdb_o5h8_user";
-    private $password = "S6PyFwmW4aZtM2ascAoh5ISxOzocEdCO";
     public $conn;
+    private $host;
+    private $port;
+    private $db_name;
+    private $username;
+    private $password;
+
+    public function __construct(){
+        $this->host = getenv('HOST');
+        $this->port = getenv('PORT');
+        $this->db_name = getenv('DBNAME');
+        $this->username = getenv('USERNAME');
+        $this->password = getenv('PASSWORD');
+    }
 
     public function getConnection() {
         // $this->conn = null;
