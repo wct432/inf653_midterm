@@ -1,6 +1,6 @@
 <?php
-require_once("set_vars.php");
-set_vars();
+
+
 class Database {
     public $conn;
     private $host;
