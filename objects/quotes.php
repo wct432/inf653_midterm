@@ -56,8 +56,8 @@ class Quotes {
                     "category_id" => $category_id
                 );
     
-                // return JSON of inserted data
-                return json_encode($data);
+                // return data
+                return $data;
             }
         } catch (PDOException $e) {
             if ($e->getCode() == '23503') {
@@ -74,9 +74,7 @@ class Quotes {
                 // Handle other types of PDOExceptions here
                 echo "Error: " . $e->getMessage();
             }
-    
-        echo("FAILURE");
-        return false;
+
     }
 
 }
@@ -120,8 +118,8 @@ class Quotes {
                 $data = array(
                     "id" => $id,
                     "quote" => $quote,
-                    "author_id" => $author_id,
-                    "category_id" => $category_id
+                    "author" => $author_id,
+                    "category" => $category_id
                 );
                 // return JSON of inserted data
                 return json_encode($data);
@@ -190,10 +188,15 @@ function delete($id) {
         // execute query
         $stmt->execute();
     
-            // fetch all rows returned by the query
+        // fetch all rows returned by the query
         $rows = array();
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $rows[] = $row;
+            $rows[] = array(
+            'id' => $row['id'],
+            'quote' => $row['quote'],
+            'author' => $row['author_id'],
+            'category' => $row['category_id']
+            );
         }
 
         // Check if row is empty
@@ -222,15 +225,22 @@ function delete($id) {
     
         // get retrieved row
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
+  
         // Check if row is empty
         if(empty($row)) {
             // Return JSON object with message "No quotes found"
             return array('message' => 'No Quotes Found');
+        } else {
+          $data = array(
+              'id' => $row['id'],
+              'quote' => $row['quote'],
+              'author' => $row['author_id'],
+              'category' => $row['category_id']
+              );
+          
+          return $data;
         }
-    
-        // return fetched row data
-        return $row;
+
     }
 
 
@@ -247,10 +257,15 @@ function delete($id) {
             // execute query
             $stmt->execute();
         
-             // fetch all rows returned by the query
+            // fetch all rows returned by the query
             $rows = array();
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $rows[] = $row;
+                $rows[] = array(
+                'id' => $row['id'],
+                'quote' => $row['quote'],
+                'author' => $row['author_id'],
+                'category' => $row['category_id']
+                );
             }
     
             // Check if row is empty
@@ -277,10 +292,15 @@ function delete($id) {
             // execute query
             $stmt->execute();
         
-             // fetch all rows returned by the query
+            // fetch all rows returned by the query
             $rows = array();
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $rows[] = $row;
+                $rows[] = array(
+                'id' => $row['id'],
+                'quote' => $row['quote'],
+                'author' => $row['author_id'],
+                'category' => $row['category_id']
+                );
             }
     
             // Check if row is empty
@@ -310,11 +330,16 @@ function delete($id) {
             // execute query
             $stmt->execute();
         
-             // fetch all rows returned by the query
-            $rows = array();
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $rows[] = $row;
-            }
+                   // fetch all rows returned by the query
+        $rows = array();
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $rows[] = array(
+            'id' => $row['id'],
+            'quote' => $row['quote'],
+            'author' => $row['author_id'],
+            'category' => $row['category_id']
+            );
+        }
     
             // Check if row is empty
             if(empty($rows)) {

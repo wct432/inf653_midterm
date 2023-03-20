@@ -96,7 +96,7 @@ class Categories {
                     "category" => $category
                 );
                 // return JSON of inserted data
-                return json_encode($data);
+                return $data;
             }
         } catch (PDOException $e) {
                 // Handle other types of PDOExceptions here

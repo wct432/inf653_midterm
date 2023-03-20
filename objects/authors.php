@@ -46,7 +46,7 @@ class Authors {
                 );
     
                 // return JSON of inserted data
-                return json_encode($data);
+                return $data;
             }
         } catch (PDOException $e) {
                 // Handle other types of PDOExceptions here
@@ -93,7 +93,7 @@ class Authors {
                     "author" => $author
                 );
                 // return JSON of inserted data
-                return json_encode($data);
+                return $data;
             }
         } catch (PDOException $e) {
                 // Handle other types of PDOExceptions here
