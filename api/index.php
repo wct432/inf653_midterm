@@ -49,6 +49,7 @@ function isJson($string) {
 
 // Switch on the path and HTTP method to determine the appropriate action
 switch ($path_segments[0]) {
+
   case 'quotes':
    get_quote_result($path_segments, $method, $db);
     break;

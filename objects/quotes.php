@@ -22,10 +22,6 @@ class Quotes {
 
 
     function create($quote, $author_id, $category_id){
-        // check if all parameters are present
-        if(empty($quote) || empty($author_id) || empty($category_id)){
-            return array('message' => 'Missing Required Parameters');
-        }
         $query = "INSERT INTO " . $this->table_name . " (quote, author_id, category_id) 
                   VALUES (:quote, :author_id, :category_id)
                   RETURNING id";
@@ -65,10 +61,10 @@ class Quotes {
             if ($e->getCode() == '23503') {
                 // Check if the error code is 23503, which is the error code for foreign key violation
                 $errorInfo = $e->errorInfo;
-                if (strpos($errorInfo[2], 'fk_author_id') !== false) {
-                    return array('message' => 'author_id Not Found');
-                } elseif (strpos($errorInfo[2], 'fk_category_id') !== false) {
-                    return array('message' => 'category_id Not Found');
+                if (strpos($errorInfo[2], 'quotes_author_id_fkey') !== false) {
+                    return json_decode(json_encode(array('message' => 'author_id Not Found')));
+                } elseif (strpos($errorInfo[2], 'quotes_category_id_fkey') !== false) {
+                    return json_decode(json_encode(array('message' => 'category_id Not Found')));
                 } else {
                     echo "Foreign key violation error: " . $e->getMessage();
                 }
@@ -85,10 +81,6 @@ class Quotes {
 
 
     function update($id, $quote, $author_id, $category_id){
-        // check if all parameters are present
-        if(empty($id) || empty($quote) || empty($author_id) || empty($category_id)){
-            return array('message' => 'Missing Required Parameters');
-        }
     
         // update query
         $query = "UPDATE " . $this->table_name . "
@@ -115,13 +107,13 @@ class Quotes {
         try {
             $stmt->execute();
             if($stmt->rowCount() == 0){
-                return array('message' => 'No Quotes Found');
+                return json_decode(json_encode(array('message' => 'No Quotes Found')));
             } else {
                 $data = array(
-                    "id" => $id,
+                    "id" => (int)$id,
                     "quote" => $quote,
-                    "author" => $author_id,
-                    "category" => $category_id
+                    "author_id" => (int)$author_id,
+                    "category_id" => (int)$category_id
                 );
                 // return JSON of inserted data
                 return $data;
@@ -130,16 +122,16 @@ class Quotes {
             if ($e->getCode() == '23503') {
                 // Check if the error code is 23503, which is the error code for foreign key violation
                 $errorInfo = $e->errorInfo;
-                if (strpos($errorInfo[2], 'fk_author_id') !== false) {
-                    return array('message' => 'author_id Not Found');
-                } elseif (strpos($errorInfo[2], 'fk_category_id') !== false) {
-                    return array('message' => 'category_id Not Found');
+                if (strpos($errorInfo[2], 'quotes_author_id_fkey') !== false) {
+                    return json_decode(json_encode(array('message' => 'author_id Not Found')));
+                } elseif (strpos($errorInfo[2], 'quotes_category_id_fkey') !== false) {
+                    return json_decode(json_encode(array('message' => 'category_id Not Found')));
                 } else {
-                    echo "Foreign key violation error: " . $e->getMessage();
+                    return json_decode(json_encode(array("Foreign key violation error: " . $e->getMessage())));
                 }
             } else {
                 // Handle other types of PDOExceptions here
-                echo "Error: " . $e->getMessage();
+                json_decode(json_encode(array("Error: " . $e->getMessage())));
             }
         return false;
         }
@@ -152,7 +144,7 @@ class Quotes {
 function delete($id) {
     // check if all parameters are present
     if(empty($id)){
-        return array('message' => 'Missing Required Parameters');
+        return json_decode(json_encode(array('message' => 'Missing Required Parameters')));
         }
     // delete query
     $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
@@ -169,7 +161,7 @@ function delete($id) {
         if($stmt->rowCount() > 0) {
             return array('id' => $id);
         } else {
-            return array('message' => 'No Quotes Found');
+            return json_decode(json_encode(array('message' => 'No Quotes Found')));
         }
     } catch(PDOException $exception) {
         echo "Error: " . $exception->getMessage();
@@ -203,7 +195,7 @@ function delete($id) {
         // Check if row is empty
         if(empty($rows)) {
             // Return JSON object with message "No quotes found"
-            return array('message' => 'No Quotes Found');
+            return arrayjson_decode(json_encode(array('message' => 'No Quotes Found')));
         }
         
         // return fetched row data
@@ -230,7 +222,7 @@ function delete($id) {
         // Check if row is empty
         if(empty($row)) {
             // Return JSON object with message "No quotes found"
-            return array('message' => 'No Quotes Found');
+            return json_decode(json_encode(array('message' => 'No Quotes Found')));
         } else {
           $data = array(
               'id' => $row['id'],
@@ -272,7 +264,7 @@ function delete($id) {
             // Check if row is empty
             if(empty($rows)) {
                 // Return JSON object with message "No quotes found"
-                return array('message' => 'No Quotes Found');
+                return json_decode(json_encode(array('message' => 'No Quotes Found')));
             }
             
             // return fetched row data
@@ -307,7 +299,7 @@ function delete($id) {
             // Check if row is empty
             if(empty($rows)) {
                 // Return JSON object with message "No quotes found"
-                return array('message' => 'No Quotes Found');
+                return json_decode(json_encode(array('message' => 'No Quotes Found')));
             }
         
             return $rows;
@@ -345,7 +337,7 @@ function delete($id) {
             // Check if row is empty
             if(empty($rows)) {
                 // Return JSON object with message "No quotes found"
-                return array('message' => 'No Quotes Found');
+                return json_decode(json_encode(array('message' => 'No Quotes Found')));
             }
         
             // return fetched row data

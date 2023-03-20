@@ -22,14 +22,23 @@ function get_author_result($path_segments, $method, $db){
       // POST LOGIC
       case 'POST':
         $data = json_decode(file_get_contents('php://input'));
-        $result = $authors->create($data->author);
+        // check if all parameters are present
+        if(empty($data->author)){
+            $result = json_decode(json_encode(array('message' => 'Missing Required Parameters')));
+        } else {
+            $result = $authors->create($data->author);
+        }
         break;
 
       // PUT LOGIC
       case 'PUT':
         if (isset($path_segments[1])) {
           $data = json_decode(file_get_contents('php://input'));
-          $result = $authors->update($data->id, $data->author);
+            if(empty($data->id) || empty($data->author)){
+              $result = json_decode(json_encode(array('message' => 'Missing Required Parameters')));
+            } else {
+              $result = $authors->update($data->id, $data->author);
+            }
         } else {
           http_response_code(400);
           $result = array('error' => 'Missing quote ID');

@@ -37,14 +37,24 @@ function get_quote_result($path_segments, $method, $db){
       // POST LOGIC
       case 'POST':
         $data = json_decode(file_get_contents('php://input'));
-        $result = $quotes->create($data->quote, $data->author_id, $data->category_id);
+        // check if all parameters are present
+        if(empty($data->quote) || empty($data->author_id) || empty($data->category_id)){
+            $result = json_decode(json_encode(array('message' => 'Missing Required Parameters')));
+        } else {
+            $result = $quotes->create($data->quote, $data->author_id, $data->category_id);
+        }
         break;
 
       // PUT LOGIC
       case 'PUT':
         if (isset($path_segments[1])) {
           $data = json_decode(file_get_contents('php://input'));
-          $result = $quotes->update($data->id, $data->quote, $data->author_id, $data->category_id);
+          // check if all parameters are present
+          if(empty($data->id) || empty($data->quote) || empty($data->author_id) || empty($data->category_id)){
+              $result = json_decode(json_encode(array('message' => 'Missing Required Parameters')));
+          } else {
+            $result = $quotes->update($data->id, $data->quote, $data->author_id, $data->category_id);
+          }
         } else {
           http_response_code(400);
           $result = array('error' => 'Missing quote ID');

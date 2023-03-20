@@ -17,13 +17,13 @@ class Categories {
     }
 
     function create($category){
-        // check if all parameters are present
-        if(empty($category)){
-            return array('message' => 'Missing Required Parameters');
-        }
+        // // check if all parameters are present
+        // if(empty($category)){
+        //     return json_decode(json_encode(array('message' => 'Missing Required Parameters')));
+        // }
         // insert query
         $query = "INSERT INTO " . $this->table_name . " (category)
-                  VALUES (category)";
+                  VALUES (:category)";
     
         // prepare query
         $stmt = $this->conn->prepare($query);
@@ -46,14 +46,13 @@ class Categories {
                 );
     
                 // return JSON of inserted data
-                return json_encode($data);
+                return $data;
             }
         } catch (PDOException $e) {
                 // Handle other types of PDOExceptions here
-                echo "Error: " . $e->getMessage();
+                echo json_decode(json_encode(array("Error: " . $e->getMessage())));
             }
-    
-        echo("FAILURE");
+      
         return false;
     }
 
@@ -65,7 +64,7 @@ class Categories {
     function update($id, $category){
         // check if all parameters are present
         if(empty($id) || empty($category)){
-            return array('message' => 'Missing Required Parameters');
+            return json_decode(json_encode(array('message' => 'Missing Required Parameters')));
         }
     
         // update query
@@ -89,7 +88,7 @@ class Categories {
         try {
             $stmt->execute();
             if($stmt->rowCount() == 0){
-                return array('message' => 'category_id not found');
+                return json_decode(json_encode(array('message' => 'category_id not found')));
             } else {
                 $data = array(
                     "id" => $id,
@@ -126,7 +125,7 @@ class Categories {
             if($stmt->rowCount() > 0) {
                 return array('id' => $id);
             } else {
-                return array('message' => 'No Category Found');
+                return json_decode(json_encode(array('message' => 'No Category Found')));
             }
         } catch(PDOException $exception) {
             echo "Error: " . $exception->getMessage();
@@ -157,7 +156,7 @@ class Categories {
         // Check if row is empty
         if(empty($rows)) {
             // Return JSON object with message "No quotes found"
-            return array('message' => 'category_id Not Found');
+            return json_decode(json_encode(array('message' => 'category_id Not Found')));
         }
         
         // return fetched row data
@@ -184,7 +183,7 @@ class Categories {
         // Check if row is empty
         if(empty($row)) {
             // Return JSON object with message "No quotes found"
-            return array('message' => 'category_id Not Found');
+            return json_decode(json_encode(array('message' => 'category_id Not Found')));
         }
     
         // return fetched row data

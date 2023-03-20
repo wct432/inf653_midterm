@@ -17,10 +17,6 @@ class Authors {
     }
 
     function create($author){
-        // check if all parameters are present
-        if(empty($author)){
-            return array('message' => 'Missing Required Parameters');
-        }
         // insert query
         $query = "INSERT INTO " . $this->table_name . " (author)
                   VALUES (:author)";
@@ -50,11 +46,9 @@ class Authors {
             }
         } catch (PDOException $e) {
                 // Handle other types of PDOExceptions here
-                echo "Error: " . $e->getMessage();
+                json_decode(json_encode(array("Error: " . $e->getMessage())));
             }
-    
-        echo("FAILURE");
-        return false;
+
     }
 
 
@@ -62,7 +56,7 @@ class Authors {
     function update($id, $author){
         // check if all parameters are present
         if(empty($id) || empty($author)){
-            return array('message' => 'Missing Required Parameters');
+            return json_decode(json_encode(array('message' => 'Missing Required Parameters')));
         }
     
         // update query
@@ -86,7 +80,7 @@ class Authors {
         try {
             $stmt->execute();
             if($stmt->rowCount() == 0){
-                return array('message' => 'author_id not found');
+                return json_decode(json_encode(array('message' => 'author_id not found')));
             } else {
                 $data = array(
                     "id" => $id,
@@ -97,7 +91,7 @@ class Authors {
             }
         } catch (PDOException $e) {
                 // Handle other types of PDOExceptions here
-                echo "Error: " . $e->getMessage();
+                json_decode(json_encode(array("Error: " . $e->getMessage())));
             }
         return false;
         }
@@ -105,7 +99,7 @@ class Authors {
     function delete($id) {
         // check if all parameters are present
         if(empty($id)){
-            return array('message' => 'Missing Required Parameters');
+            return json_decode(json_encode(array('message' => 'Missing Required Parameters')));
             }
         // delete query
         $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
@@ -123,10 +117,10 @@ class Authors {
             if($stmt->rowCount() > 0) {
                 return array('id' => $id);
             } else {
-                return array('message' => 'No Authors Found');
+                return json_decode(json_encode(array('message' => 'No Authors Found')));
             }
         } catch(PDOException $exception) {
-            echo "Error: " . $exception->getMessage();
+            return json_decode(json_encode(array("Error: " . $exception->getMessage())));
             return false;
         }
     }
@@ -151,7 +145,7 @@ class Authors {
         // Check if row is empty
         if(empty($rows)) {
             // Return JSON object with message "No quotes found"
-            return array('message' => 'author_id Not Found');
+            return json_decode(json_encode(array('message' => 'author_id Not Found')));
         }
         
         // return fetched row data
@@ -178,7 +172,7 @@ class Authors {
         // Check if row is empty
         if(empty($row)) {
             // Return JSON object with message "No quotes found"
-            return array('message' => 'author_id Not Found');
+            return json_decode(json_encode(array('message' => 'author_id Not Found')));
         }
     
         // return fetched row data

@@ -20,14 +20,24 @@ function get_category_result($path_segments, $method, $db){
       // POST LOGIC
       case 'POST':
         $data = json_decode(file_get_contents('php://input'));
-        $result = $categories->create($data->category);
+        // check if all parameters are present
+        if(empty($data->category)){
+            $result = json_decode(json_encode(array('message' => 'Missing Required Parameters')));
+        } else {
+            $result = $categories->create($data->category);      
+        }
+
         break;
 
       // PUT LOGIC
       case 'PUT':
         if (isset($path_segments[1])) {
           $data = json_decode(file_get_contents('php://input'));
-          $result = $categories->update($data->id, $data->category);
+          if(empty($data->id) || empty($data->category)){
+            $result = json_decode(json_encode(array('message' => 'Missing Required Parameters')));
+          } else {
+           $result = $categories->update($data->id, $data->category); 
+          }
         } else {
           http_response_code(400);
           $result = array('error' => 'Missing quote ID');
