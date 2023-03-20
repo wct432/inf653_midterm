@@ -16,29 +16,29 @@ class Categories {
         $this->conn = $db;
     }
 
-    function create($id, $category){
+    function create($category){
         // check if all parameters are present
-        if(empty($id) || empty($category)){
+        if(empty($category)){
             return array('message' => 'Missing Required Parameters');
         }
         // insert query
-        $query = "INSERT INTO " . $this->table_name . " (id, category)
-                  VALUES (:id, :category)";
+        $query = "INSERT INTO " . $this->table_name . " (category)
+                  VALUES (category)";
     
         // prepare query
         $stmt = $this->conn->prepare($query);
     
         // sanitize
-        $id=htmlspecialchars(strip_tags($id));
         $category=htmlspecialchars(strip_tags($category));
     
         // bind values
-        $stmt->bindParam(":id", $id);
         $stmt->bindParam(":category", $category);
 
         try {
             // execute query
             if($stmt->execute()){
+               // get the ID of the inserted record
+                $id = $this->conn->lastInsertId();
                 // construct array of inserted data
                 $data = array(
                     "id" => $id,

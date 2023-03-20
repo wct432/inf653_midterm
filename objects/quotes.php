@@ -21,14 +21,15 @@ class Quotes {
     }
 
 
-    function create($id, $quote, $author_id, $category_id){
+    function create($quote, $author_id, $category_id){
         // check if all parameters are present
-        if(empty($id) || empty($quote) || empty($author_id) || empty($category_id)){
+        if(empty($quote) || empty($author_id) || empty($category_id)){
             return array('message' => 'Missing Required Parameters');
         }
-        // insert query
-        $query = "INSERT INTO " . $this->table_name . " (id, quote, author_id, category_id) 
-                  VALUES (:id, :quote, :author_id, :category_id)";
+        $query = "INSERT INTO " . $this->table_name . " (quote, author_id, category_id) 
+                  VALUES (:quote, :author_id, :category_id)
+                  RETURNING id";
+
     
         // prepare query
         $stmt = $this->conn->prepare($query);
@@ -39,7 +40,6 @@ class Quotes {
         $category_id=htmlspecialchars(strip_tags($category_id));
     
         // bind values
-        $stmt->bindParam(":id", $id);
         $stmt->bindParam(":quote", $quote);
         $stmt->bindParam(":author_id", $author_id);
         $stmt->bindParam(":category_id", $category_id);
@@ -48,6 +48,8 @@ class Quotes {
         try {
             // execute query
             if($stmt->execute()){
+               // get the ID of the inserted record
+                $id = $this->conn->lastInsertId();
                 // construct array of inserted data
                 $data = array(
                     "id" => $id,
@@ -55,7 +57,7 @@ class Quotes {
                     "author_id" => $author_id,
                     "category_id" => $category_id
                 );
-    
+
                 // return data
                 return $data;
             }
@@ -122,7 +124,7 @@ class Quotes {
                     "category" => $category_id
                 );
                 // return JSON of inserted data
-                return json_encode($data);
+                return $data;
             }
         } catch (PDOException $e) {
             if ($e->getCode() == '23503') {
@@ -164,7 +166,6 @@ function delete($id) {
     try {
         // execute query
         $stmt->execute();
-        // echo($stmt->rowCount());
         if($stmt->rowCount() > 0) {
             return array('id' => $id);
         } else {

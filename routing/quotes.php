@@ -37,7 +37,7 @@ function get_quote_result($path_segments, $method, $db){
       // POST LOGIC
       case 'POST':
         $data = json_decode(file_get_contents('php://input'));
-        $result = $quotes->create($data->id, $data->quote, $data->author_id, $data->category_id);
+        $result = $quotes->create($data->quote, $data->author_id, $data->category_id);
         break;
 
       // PUT LOGIC

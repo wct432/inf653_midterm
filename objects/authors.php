@@ -16,29 +16,29 @@ class Authors {
         $this->conn = $db;
     }
 
-    function create($id, $author){
+    function create($author){
         // check if all parameters are present
-        if(empty($id) || empty($author)){
+        if(empty($author)){
             return array('message' => 'Missing Required Parameters');
         }
         // insert query
-        $query = "INSERT INTO " . $this->table_name . " (id, author)
-                  VALUES (:id, :author)";
+        $query = "INSERT INTO " . $this->table_name . " (author)
+                  VALUES (:author)";
     
         // prepare query
         $stmt = $this->conn->prepare($query);
     
         // sanitize
-        $id=htmlspecialchars(strip_tags($id));
         $author=htmlspecialchars(strip_tags($author));
     
         // bind values
-        $stmt->bindParam(":id", $id);
         $stmt->bindParam(":author", $author);
 
         try {
             // execute query
             if($stmt->execute()){
+                // get the ID of the inserted record
+                $id = $this->conn->lastInsertId();
                 // construct array of inserted data
                 $data = array(
                     "id" => $id,

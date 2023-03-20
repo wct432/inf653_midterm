@@ -22,7 +22,7 @@ function get_author_result($path_segments, $method, $db){
       // POST LOGIC
       case 'POST':
         $data = json_decode(file_get_contents('php://input'));
-        $result = $authors->create($data->id, $data->author);
+        $result = $authors->create($data->author);
         break;
 
       // PUT LOGIC

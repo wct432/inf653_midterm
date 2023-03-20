@@ -20,7 +20,7 @@ function get_category_result($path_segments, $method, $db){
       // POST LOGIC
       case 'POST':
         $data = json_decode(file_get_contents('php://input'));
-        $result = $categories->create($data->id, $data->category);
+        $result = $categories->create($data->category);
         break;
 
       // PUT LOGIC
